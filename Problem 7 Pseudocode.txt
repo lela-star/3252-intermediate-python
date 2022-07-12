@@ -1,0 +1,130 @@
+[b]Part 1[/b]
+Fortunately, I didn't seem to run into any bugs in the first part of Problem 7. String indexing proved to be extremely useful. I wrote the pseudocode after I coded the first part because before I didn't know what even was pseudocode.
+
+Pseudocode:
+[code]
+function encipher_fence(plaintext, numRails): encodes plaintext using the railfence cipher; numRails is the number of rails
+    create the integer variable railcount, set to -1, as the starting point to create the rail
+    create the list plainchars as the list of the characters in the plaintext
+    create the empty list charsinrail as the list of the characters in the rail
+    create the empty list rails as the list of the rails
+
+    for i to numRails:
+        create the empty string variable rail as the rail itself
+        increase railcount by 1
+        set the list charsinrail to a section of the list of the characters in the plaintext
+        this section is starting at the starting point, ending at the length of the plaintext, and skipping characters by the amount of rails
+        for char in charsinrail:
+            add each character in the list of characters to the empty rail
+        insert the finished rail at the start of the total list of rails
+        create the empty string variable encipheredtext as the text to combine the rails into
+        for item in the list of rails:
+            add each item in the list of rails to the empty text
+
+    return the enciphered text
+[/code]
+
+[b]Part 2[/b]
+I wrote Part 2 without writing any pseudocode (again, because I didn't know what it was) and I ran into an overload of bugs and glitches and weird outputs that had absolutely no relationship whatsoever with the inputs. However, after helping and receiving advice from a few classmates and instructors, I supposedly fixed the problems with my code. All the test cases seemed to be working perfectly fine... except when I tried some other test cases I came up with myself. Enciphering "This is a test." with my encipher_fence function seemed to work (I know that my enciphering function works well) but deciphering it with my deciphering_fence function outputted gibberish. After finding out what pseudocode was, I decided to completely start over with part 2 and write its pseudocode. I encountered a few small but easily fixed bugs. They were all something like "IndexError: list index out of range", but I managed to fix them all by printing out certain variables to see where things went wrong and adjusting my code accordingly.
+
+Pseudocode:
+[code]
+function decipher_fence(ciphertext, numRails): returns decoding of ciphertext using railfence cipher with numRails rails
+
+    create the list cipherchars as the list of the characters in the ciphertext
+    create the integer variable cipherlength as the length of the ciphertext
+    create the empty list raillengths as the list of the lengths of the rails
+    create the integer variable smallrail, set to cipherlength // numRails, as the smallest size of rail (integer division)
+    create the integer variable railleftover, set to cipherlength % numRails, as the leftover characters (remainder)
+    create the integer variable count, set to cipherlength, as the count of the remaining characters left to distribute
+    create the empty list rails as the list of rails
+    create the empty variable decipheredtext as the deciphered text
+    create the empty variable finaltext as the deciphered text without placeholder characters
+
+    while the count is greater than smallrail multiplied by railleftover plus railleftover:
+        append smallrail to raillengths
+        subtract smallrail from the count
+    for i to railleftover:
+        append smallrail + 1 to raillengths
+        subtract smallrail + 1 from count
+    append 0 to raillengths to eliminate the 'list index out of range' error
+    create the integer variable startposition, set to 0, to represent the starting position of the rail
+    create the integer variable endposition, set to the first element of raillengths, to represent the ending position of the rail
+    for i to numRails:
+        insert a section of the list of the characters in the ciphertext into index 0 of the list of rails
+        the section is starting at the startposition, and ending at the endposition
+        set the startposition to the endposition
+        add the element i + 1 of raillengths to the endposition
+    for rail in rails:
+        if the length of the rail is equal to smallrail and railleftover is not equal to 0:
+            add "|", a placeholder character, to rail
+    create the integer variable extra, set to 0, to account for the extra character in the large rail
+    if railleftover is not equal to 0:
+        set extra to 1
+    for i to smallrail + extra:
+        for rail in rails:
+            create the list raillist as the list of the characters in the rail
+            add element i of raillist to decipheredtext
+    create the list decipheredlist as the list of the characters in decipheredtext
+    create the integer variable difference as the imbalance of the indexes of the list created by removing a character
+    for i to the length of the deciphered text:
+        if element i - difference of decipheredlist is equal to "|":
+            pop the element i - difference of decipheredlist
+            add 1 to the difference
+    for item in decipheredlist:
+        add item to finaltext
+
+    return the final deciphered text
+[/code]
+
+[b]Part 3[/b]
+Miraculously, I didn't run into any errors. I wrote all the pseudocode before writing my Python, so I think that really helped me plan and structure my code. 
+
+Pseudocode:
+
+[code]
+function decode_text(ciphertext, wordfilename): attempts to decode ciphertext using railfence cipher; wordfilename is a file with a list of valid words
+
+    create the variable file as the opening of a file wordfilename with reading mode
+    create the empty list decodes as the possible decodings of the ciphertext
+    create the empty string variable decodedtext as the decoded text
+    create the string variable punctuation, set to "!\"#$%&()*+,-./:;<=>?@[\\]^_`{|}~", as punctuation to remove
+    create the empty list words as the words in the dictionary
+    create the integer variable count, set to -1, as the index of the decode that works
+    create the integer variable highscore, set to 0, as the highest amount of valid words
+    create the integer variable highcount, set to 0, as the highest count with the highest score
+
+    while True:
+        create the variable word as the reading of a line in file
+        if the length of the word is equal to 0:
+            break
+        create the list wordchars as the list of the characters in the word
+        pop the last character in wordchars
+        create the empty string newword as the new word without the new line
+        for char in wordchars:
+            add char to the new word
+        append the new word to words
+    close the file
+    for i in range(2, 11):
+        append the result of function decipher_fence(ciphertext, i) to decodes
+    for decode in decodes:
+        create the empty string variable cleandecode, as the decode without punctuation
+        create the empty string variable lowerdecode, as the decode in lowercase
+        create the empty list splitdecode, as the list of the characters in the decode without whitespace
+        create the integer variable validity, set to 0, as the number of valid words
+        add 1 to the count
+        for letter in decode:
+            if letter is not in punctuation:
+                add the letter to cleandecode
+        set lowerdecode to cleandecode in lowercase
+        set splitdecode to lowerdecode split
+        for word in splitdecode:
+            if the word is in words:
+                validity += 1
+        if validity is greater than or equal to highscore:
+            set the highscore to validity
+            set the highcount to count
+        
+    set decoded text to index highcount of decodes
+    return decodedtext
+[/code]
